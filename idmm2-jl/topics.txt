@@ -1,0 +1,63 @@
+消息中间件已经安装部署完毕,  zookeeper地址:  172.21.11.63:2180,172.21.11.64:2180,172.21.11.65:2180
+已经配置的主题见列表(注意主题实际名称都加了后缀 -A -B):
+
+idmm / idmm
+
+vi idmm3/broker[01]/config/ble/server-ble-oracle.properties idmm3/broker[01]/config/broker/server-oracle.properties
+vi idmm3/broker[01]/config/broker/server-oracle.properties
+
+
+cd /idmm
+idmm3/broker0/bin/ble/startup.sh
+idmm3/broker1/bin/ble/startup.sh
+idmm3/broker0/bin/broker/startup.sh
+idmm3/broker1/bin/broker/startup.sh
+
+idmm-zk/bin/zkCli.sh -server 172.21.11.63:2180,172.21.11.64:2180,172.21.11.65:2180
+idmm-zk/bin/zkCli.sh -server 172.21.11.63:8541
+
+0,5,10,15,20,25,30,35,40,45,50,55 * * * * /bin/bash /idmm/idmm3/proc_mon.sh >/dev/null 2>&1
+
+topics:
+===============================================
+Pub113	T113Smsp	Sub101Smsp	T113SmspDest
+Pub103	TBatchOrder	Sub101Batch	TBatchOrderDest
+Pub103	TBatchOrderBack	Sub101OrderBack	TBatchOrderBackDest
+Pub101	T101DataSyn	Sub115	T101DataSynDest
+Pub101	T101OrderDataSyn	Sub103OrderDataSyn	T101OrderDataSynDest
+Pub101	T101BusiOrder	Sub109BusiOdr	T101BusiOrderDest
+Pub101	T101Smsp	Sub113Order	T101SmspDest
+Pub101	T101RptOrder	Sub111RptOrder	T101RptOrderDest
+Pub101	T101RptOrderLine	Sub111RptOrderLine	T101RptOrderLineDest
+Pub101	TRecOprCntt	Sub103Opr	TRecOprCnttDest
+Pub101	TRecOprCntt	Sub119	TRecOprCntt
+Pub101	TOrderBatch	Sub103Batch	TOrderBatchDest
+Pub101	T101Confirm	Sub101Conf	T101ConfirmDest
+Pub101	T101Sreq	Sub103Sreq	T101SreqDest
+Pub101	T101Rptb2cOrder	Sub111Rptb2cOrder	T101Rptb2cOrderDest
+Pub113	TSmsHigh	Sub129High	TSmsHighDest
+Pub113	T113Smsp	Sub101Smsp	T113SmspDest
+Pub109	T109Smsp	Sub113Credit	T109SmspDest
+Pub107	TSynLoginNo	Sub113SynLoginNo	TSynLoginNoDest
+Pub101	T101Smsp	Sub113Order	T101SmspDest
+Pub117	TSmsMiddle	Sub129Middle	TSmsMiddleDest
+Pub131	TSmsMiddle	Sub129Middle	TSmsMiddleDest
+Pub130	TSmsHigh	Sub129High	TSmsHighDest
+Pub109	T109BusiOrder	Sub103BusiOdr	T109BusiOrderDest
+Pub109	T109Smsp	Sub113Credit	T109SmspDest
+Pub109	TSmsHigh	Sub129High	TSmsHighDest
+Pub109	TSmsMiddle	Sub129Middle	TSmsMiddleDest
+Pub109	TSmsLow	Sub129Low	TSmsLowDest
+Pub109	TSmsgroup	Sub129group	TSmsgroupDest
+Pub109	T109Rpt	Sub111RptBoss	T109RptDest
+Pub109	TRecQryCntt	Sub111Cntt	TRecQryCnttDest
+Pub109	TRecQryCntt	Sub119	TRecQryCnttDest
+Pub109	TRecOprCntt	Sub103Opr	TRecOprCnttDest
+Pub109	TRecOprCntt	Sub119Opr	TRecOprCnttDest
+Pub109	T109Market	Sub115Zw	T109MarketDest
+Pub109	T109Order	Sub109Busi	T109OrderDest
+Pub109	T109OrderBatch	Sub109Busi	T109OrderDest
+Pub109	T109DataRpt	Sub109DataRpt	T109DataRptDest
+Pub109	T109ElecInvcReq	Sub101ElecInvcReq	T109ElecInvcReqDest
+Pub109	T109SmspGW	Sub113Credit	T109SmspGWDest
+Pub109	TFundBind	Sub117FundBind	TFundBindDest

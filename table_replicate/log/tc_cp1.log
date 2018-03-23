@@ -1,0 +1,60 @@
+2016-10-18 15:53:46,864 - cp1 - INFO - trying connect to db
+2016-10-18 15:53:46,865 - cp1 - INFO - Initial the parameters finished.
+2016-10-18 15:53:47,648 - cp1 - INFO - connected to database, name: dbcrma  type: oracle
+2016-10-18 15:53:48,033 - cp1 - INFO - connected to database, name: dbcrma  type: oracle
+2016-10-18 15:53:50,092 - cp1 - INFO - success finished onecopy, 8
+2016-10-18 15:53:51,102 - cp1 - INFO - success finished onecopy, 0
+2016-10-18 15:59:00,145 - cp1 - INFO - trying connect to db
+2016-10-18 15:59:00,147 - cp1 - INFO - Initial the parameters finished.
+2016-10-18 15:59:00,721 - cp1 - INFO - connected to database, name: dbcrma  type: oracle
+2016-10-18 15:59:01,101 - cp1 - INFO - connected to database, name: dbcrma  type: oracle
+2016-10-18 15:59:03,082 - cp1 - INFO - success finished onecopy, 8
+2016-10-18 15:59:04,096 - cp1 - INFO - success finished onecopy, 0
+2016-10-18 16:10:04,687 - cp1 - INFO - trying connect to db
+2016-10-18 16:10:04,688 - cp1 - INFO - Initial the parameters finished.
+2016-10-18 16:10:05,243 - cp1 - INFO - connected to database, name: dbcrma  type: oracle
+2016-10-18 16:10:05,605 - cp1 - INFO - connected to database, name: dbcrma  type: oracle
+2016-10-18 16:10:07,688 - cp1 - INFO - success finished onecopy, 8
+2016-10-18 16:10:08,706 - cp1 - INFO - success finished onecopy, 0
+2016-10-18 16:10:13,717 - cp1 - INFO - success finished onecopy, 0
+2016-10-18 16:12:25,555 - cp1 - INFO - trying connect to db
+2016-10-18 16:12:25,556 - cp1 - INFO - Initial the parameters finished.
+2016-10-18 16:12:26,036 - cp1 - INFO - connected to database, name: dbcrma  type: oracle
+2016-10-18 16:12:26,391 - cp1 - INFO - connected to database, name: dbcrma  type: oracle
+2016-10-18 16:12:28,591 - cp1 - INFO - success finished onecopy, 8
+2016-10-18 16:12:29,599 - cp1 - INFO - success finished onecopy, 0
+2016-10-18 16:13:12,813 - cp1 - INFO - trying connect to db
+2016-10-18 16:13:12,815 - cp1 - INFO - Initial the parameters finished.
+2016-10-18 16:13:13,302 - cp1 - INFO - connected to database, name: dbcrma  type: oracle
+2016-10-18 16:13:13,677 - cp1 - INFO - connected to database, name: dbcrma  type: oracle
+2016-10-18 16:13:15,667 - cp1 - INFO - success finished onecopy, 8
+2016-10-18 16:13:16,677 - cp1 - INFO - success finished onecopy, 0
+2016-10-18 16:14:00,513 - cp1 - INFO - trying connect to db
+2016-10-18 16:14:00,515 - cp1 - INFO - Initial the parameters finished.
+2016-10-18 16:14:00,980 - cp1 - INFO - connected to database, name: dbcrma  type: oracle
+2016-10-18 16:14:01,339 - cp1 - INFO - connected to database, name: dbcrma  type: oracle
+2016-10-18 16:14:03,312 - cp1 - INFO - success finished onecopy, 8
+2016-10-18 16:14:04,322 - cp1 - INFO - success finished onecopy, 0
+2016-10-18 16:15:59,917 - cp1 - INFO - trying connect to db
+2016-10-18 16:15:59,918 - cp1 - INFO - Initial the parameters finished.
+2016-10-18 16:16:00,381 - cp1 - INFO - connected to database, name: dbcrma  type: oracle
+2016-10-18 16:16:00,743 - cp1 - INFO - connected to database, name: dbcrma  type: oracle
+2016-10-18 16:16:02,813 - cp1 - INFO - success finished onecopy, 8
+2016-10-18 16:16:03,823 - cp1 - INFO - success finished onecopy, 0
+2016-10-18 16:18:05,262 - cp1 - INFO - trying connect to db
+2016-10-18 16:18:05,263 - cp1 - INFO - Initial the parameters finished.
+2016-10-18 16:18:05,737 - cp1 - INFO - connected to database, name: dbcrma  type: oracle
+2016-10-18 16:18:06,084 - cp1 - INFO - connected to database, name: dbcrma  type: oracle
+2016-10-18 16:18:06,092 - cp1 - INFO - success finished onecopy, 0
+2016-10-18 16:18:18,194 - cp1 - INFO - trying connect to db
+2016-10-18 16:18:18,196 - cp1 - INFO - Initial the parameters finished.
+2016-10-18 16:18:18,668 - cp1 - INFO - connected to database, name: dbcrma  type: oracle
+2016-10-18 16:18:19,036 - cp1 - INFO - connected to database, name: dbcrma  type: oracle
+2016-10-18 16:18:21,756 - cp1 - INFO - success finished onecopy, 8
+2016-10-18 16:18:22,766 - cp1 - INFO - success finished onecopy, 0
+2016-10-18 16:21:58,355 - cp1 - INFO - trying connect to db
+2016-10-18 16:21:58,357 - cp1 - INFO - Initial the parameters finished.
+2016-10-18 16:21:58,838 - cp1 - INFO - connected to database, name: dbcrma  type: oracle
+2016-10-18 16:21:59,229 - cp1 - INFO - connected to database, name: dbcrma  type: oracle
+2016-10-18 16:22:01,884 - cp1 - INFO - success finished onecopy, 8
+2016-10-18 16:22:02,895 - cp1 - INFO - success finished onecopy, 0

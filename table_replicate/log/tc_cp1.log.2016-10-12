@@ -1,0 +1,63 @@
+2016-10-12 11:17:47,786 - cp1 - INFO - trying connect to db
+2016-10-12 11:17:47,788 - cp1 - INFO - Initial the parameters finished.
+2016-10-12 11:17:48,298 - cp1 - INFO - connected to database, name: dbcrma  type: oracle
+2016-10-12 11:17:48,668 - cp1 - INFO - connected to database, name: dbcrma  type: oracle
+2016-10-12 11:17:48,684 - cp1 - INFO - success finished onecopy, 0
+2016-10-12 11:17:53,694 - cp1 - INFO - success finished onecopy, 0
+2016-10-12 11:17:58,704 - cp1 - INFO - success finished onecopy, 0
+2016-10-12 11:18:03,717 - cp1 - INFO - success finished onecopy, 0
+2016-10-12 11:25:56,296 - cp1 - INFO - trying connect to db
+2016-10-12 11:25:56,298 - cp1 - INFO - Initial the parameters finished.
+2016-10-12 11:25:56,780 - cp1 - INFO - connected to database, name: dbcrma  type: oracle
+2016-10-12 11:25:57,167 - cp1 - INFO - connected to database, name: dbcrma  type: oracle
+2016-10-12 14:16:11,056 - cp1 - INFO - trying connect to db
+2016-10-12 14:16:11,058 - cp1 - INFO - Initial the parameters finished.
+2016-10-12 14:16:11,607 - cp1 - INFO - connected to database, name: dbcrma  type: oracle
+2016-10-12 14:16:11,970 - cp1 - INFO - connected to database, name: dbcrma  type: oracle
+2016-10-12 14:16:12,219 - cp1 - ERROR - onecopy faild: 1 >v…nÕ€t‡S¿®FÂ ORA-01465: invalid hex number
+
+2016-10-12 14:16:12,453 - cp1 - ERROR - onecopy faild: 2 >v…nÕ‹t‡S¿®FÂ ORA-01465: invalid hex number
+
+2016-10-12 14:16:12,683 - cp1 - ERROR - onecopy faild: 3 >v…nÕ›t‡S¿®FÂ ORA-01465: invalid hex number
+
+2016-10-12 14:16:12,940 - cp1 - ERROR - onecopy faild: 4 >v…nÕﬁt‡S¿®FÂ ORA-01465: invalid hex number
+
+2016-10-12 14:16:13,168 - cp1 - ERROR - onecopy faild: 5 >v…nÕﬂt‡S¿®FÂ ORA-01465: invalid hex number
+
+2016-10-12 14:16:13,390 - cp1 - ERROR - onecopy faild: 6 >v…nÕ‡t‡S¿®FÂ ORA-01465: invalid hex number
+
+2016-10-12 14:16:13,624 - cp1 - ERROR - onecopy faild: 7 >v…nÕ·t‡S¿®FÂ ORA-01465: invalid hex number
+
+2016-10-12 14:16:13,854 - cp1 - ERROR - onecopy faild: 8 >v…nÕ‚t‡S¿®FÂ ORA-01465: invalid hex number
+
+2016-10-12 14:16:13,861 - cp1 - INFO - success finished onecopy, 8
+2016-10-12 14:21:41,023 - cp1 - INFO - trying connect to db
+2016-10-12 14:21:41,025 - cp1 - INFO - Initial the parameters finished.
+2016-10-12 14:21:41,648 - cp1 - INFO - connected to database, name: dbcrma  type: oracle
+2016-10-12 14:21:42,073 - cp1 - INFO - connected to database, name: dbcrma  type: oracle
+2016-10-12 14:24:25,842 - cp1 - INFO - trying connect to db
+2016-10-12 14:24:25,842 - cp1 - INFO - Initial the parameters finished.
+2016-10-12 14:24:26,323 - cp1 - INFO - connected to database, name: dbcrma  type: oracle
+2016-10-12 14:24:26,719 - cp1 - INFO - connected to database, name: dbcrma  type: oracle
+2016-10-12 14:24:26,963 - cp1 - ERROR - onecopy faild: 1 >v…nÕ€t‡S¿®FÂ ORA-01465: invalid hex number
+
+2016-10-12 14:24:27,198 - cp1 - ERROR - onecopy faild: 2 >v…nÕ‹t‡S¿®FÂ ORA-01465: invalid hex number
+
+2016-10-12 14:24:27,437 - cp1 - ERROR - onecopy faild: 3 >v…nÕ›t‡S¿®FÂ ORA-01465: invalid hex number
+
+2016-10-12 14:24:27,671 - cp1 - ERROR - onecopy faild: 4 >v…nÕﬁt‡S¿®FÂ ORA-01465: invalid hex number
+
+2016-10-12 14:24:27,931 - cp1 - ERROR - onecopy faild: 5 >v…nÕﬂt‡S¿®FÂ ORA-01465: invalid hex number
+
+2016-10-12 14:24:28,180 - cp1 - ERROR - onecopy faild: 6 >v…nÕ‡t‡S¿®FÂ ORA-01465: invalid hex number
+
+2016-10-12 14:24:28,410 - cp1 - ERROR - onecopy faild: 7 >v…nÕ·t‡S¿®FÂ ORA-01465: invalid hex number
+
+2016-10-12 14:24:28,638 - cp1 - ERROR - onecopy faild: 8 >v…nÕ‚t‡S¿®FÂ ORA-01465: invalid hex number
+
+2016-10-12 14:24:28,645 - cp1 - INFO - success finished onecopy, 8
+2016-10-12 14:40:24,130 - cp1 - INFO - trying connect to db
+2016-10-12 14:40:24,131 - cp1 - INFO - Initial the parameters finished.
+2016-10-12 14:40:24,621 - cp1 - INFO - connected to database, name: dbcrma  type: oracle
+2016-10-12 14:40:24,974 - cp1 - INFO - connected to database, name: dbcrma  type: oracle
+2016-10-12 14:40:27,835 - cp1 - INFO - success finished onecopy, 8
