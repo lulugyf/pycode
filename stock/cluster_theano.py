@@ -5,10 +5,11 @@ import numpy
 import theano
 import theano.tensor as T
 from theano import function, config, shared, sandbox
-# from theano import ProfileMode
+
 from sklearn import cluster, datasets
 import matplotlib.pyplot as plt
-
+from six.moves import cPickle as pickle
+import os
 
 # https://github.com/erogol/KLP_KMEANS/blob/master/klp_kmeans.py
 # https://gist.github.com/erogol/7946246   ===
@@ -51,6 +52,8 @@ def rsom(data, cluster_num, alpha, epochs=-1, batch=1, verbose=False):
     for epoch in range(epochs):
         C = 0
         for i in range(0, data.shape[0], batch):
+            if i + batch >= data.shape[0]:
+                i = data.shape[0]-batch
             D = find_bmu(data[i:i + batch, :])
             S = np.zeros([batch, cluster_num])
             S[range(batch), D] = 1
@@ -59,7 +62,6 @@ def rsom(data, cluster_num, alpha, epochs=-1, batch=1, verbose=False):
         if epoch % 10 == 0 and verbose:
             print("Avg. centroid distance -- ", cost.sum(), "\t EPOCH : ", epoch)
     return W.get_value()
-
 
 def kmeans(X, cluster_num, numepochs, learningrate=0.01, batchsize=100, verbose=True):
     rng = numpy.random
@@ -149,13 +151,19 @@ def split_k_data():
     fd.close()
     fd1.close()
 
-
-from six.moves import cPickle as pickle
-import os
-def stock_data():
     pickle_file = "e:/stock/clusters0329.pickle"
-    DATA = np.loadtxt('e:/stock/lines0329.txt', dtype='float32')
-    W = rsom(DATA, 30, alpha=0.001, epochs=100, batch=200, verbose=True)
+    lines = np.loadtxt('e:/stock/lines0329.txt', dtype='float32')
+    with open(pickle_file, "wb") as f:
+        pickle.dump(lines, f, pickle.HIGHEST_PROTOCOL)
+
+
+def stock_data():
+    from six.moves import cPickle as pickle
+    pickle_file = "e:/stock/clusters0329.pickle"
+    with open(pickle_file, "rb") as f: lines = pickle.load(f)
+    #DATA = np.loadtxt('e:/stock/lines0329.txt', dtype='float32')
+
+    W = rsom(lines, 30, alpha=0.001, epochs=100, batch=200, verbose=True)
 
     tag = np.loadtxt('e:/stock/tag0329.txt', dtype='float32')
     clusters = np.loadtxt('e:/stock/out/out/clusters', dtype='int') # 这个文件是spark 聚类计算结果

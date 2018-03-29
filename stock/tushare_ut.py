@@ -139,6 +139,7 @@ def dateadd(sdate, n):
     d1 = d + datetime.timedelta(days=n)
     return d1.strftime("%Y-%m-%d")
 
+import time
 def __ts_down_increasely(fpath):
     fname = fpath[fpath.rfind('/')+1:]
     if len(fname) != 10:
@@ -148,6 +149,12 @@ def __ts_down_increasely(fpath):
     #fpath = "%s/%s" %(basedir, fname)
     l = lastline(fpath)
     start = dateadd(l[:8], 1)
+    if time.strftime("%Y%m%d") == l[:8]:
+        print("today skip1 %s"%code); return
+    # today = time.strftime("%Y-%m-%d")
+    # if today == start:
+    #     print("%s today, skip"%code)
+    #     return
     df = ts.get_k_data(code=code,autype='hfq',ktype='D',start=start)
     out = io.StringIO()
     df.to_csv(out, header=None, index=None, sep=' ')

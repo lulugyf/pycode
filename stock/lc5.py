@@ -253,6 +253,7 @@ set QT_PLUGIN_PATH=d:\dev\Anaconda3\Library\plugins
 import sys
 sys.path.insert(0, 'e:/worksrc/pycode/stock')
 from importlib import reload
+import cluster_theano as ct
 import lc5 as l
 
 l.split_k_data()
