@@ -1,7 +1,7 @@
 #encoding=utf-8
 import struct
 
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 import math
 import sys
 import os
@@ -149,7 +149,7 @@ def dtest3(fpath, fd, fd1, lsize=30, skip=5):
         fd.write(" ".join(["%.4f"%i for i in d2]))
         fd.write('\n')
 
-        # 报错后续走势到另一文件中
+        # 保存后续走势到另一文件中
         k1 = lday.unpack(s1[:32])
         k2 = lday.unpack(s1[32:])
         ss = "%s %d %d %d %d %d %d %d %d %d %d %d %d %d\n" %(fpath[-12:], k0[0], k0[4], k0[6],
@@ -200,7 +200,63 @@ def ts_down_increasely(basedir='e:/stock/list11'):
             out.close()
 
 
+# 切分 k 线数据为 lsize 长度的向量数据,
+# 读取k 日线数据， 输出长度lsize， 每个元素的值为 (Ci - Cx) / Cx  * 100.0, 跳跃skip个数据,
+#    nextdays: 后续走势取多少个
+# 其中 Ci 为第i个k线的收盘价， Cx 为首元素前一个k线的收盘价（同一段中其为固定值）
+# 后续走势格式: fname date0 c0 maxC minC,   其中 maxC为后续 nextdays 中的最高收盘价涨幅(相对lsize最后一个数据的收盘价)
+# 文件数据格式 date open high low
+def split_one_file(args): # fpath, nH=11, loop=6, ratio=1.3):
+    fpath, fd, fd1, lsize , skip, nextdays  = args
+    dc = np.loadtxt(fpath, dtype=float)
+    if dc.shape[0] < 100: #太短的忽略
+        return 0
+    mindate = 20100101 # 取20100101 之后的数据
+    fcode = fpath[-10:-4]
 
+    print("   ", dc[0, 0], dc[-1, 0], fpath)
+    for i in range(dc.shape[0]):
+        if dc[i, 0] > mindate:
+            dc = dc[i:, :]
+            break
+    count = 0
+    for i in range(0, dc.shape[0]-lsize-nextdays, skip):
+        d = dc[i: i+lsize, 2] # close
+        C = d[0]
+        d = (d - C) / C * 100.0
+
+        fd.write(" ".join(["%.4f" % i for i in d]))
+        fd.write('\n')
+
+        C = dc[i+lsize-1, 2]
+        d1 = dc[i+lsize:i+lsize+nextdays, 2]
+        fd1.write("%s %d %.4f %.4f\n"%(fcode, dc[i+lsize, 0], (np.max(d1)-C)/C*100.0, (np.min(d1)-C)/C*100.0))
+        count +=1
+    print("===", fcode, count)
+
+def split_k_data():
+    basedir = "e:/stock/list11"
+    fd = open("e:/stock/lines0329.txt", "w")
+    fd1 = open("e:/stock/tag0329.txt", "w")
+    arglist = [("%s/%s" % (basedir, fname), fd, fd1, 30, 5, 6) for fname in os.listdir(basedir)]
+    for args in arglist:
+        if True or args[0].find('603997') > 0:
+            split_one_file(args)
+    fd.close()
+    fd1.close()
+    #Pool(8).map(one_file, filelist)
+
+'''
+set path=d:\dev\Anaconda3\Scripts;d:\dev\Anaconda3;C:\WINDOWS\system32;C:\WINDOWS
+set QT_PLUGIN_PATH=d:\dev\Anaconda3\Library\plugins
+
+import sys
+sys.path.insert(0, 'e:/worksrc/pycode/stock')
+from importlib import reload
+import lc5 as l
+
+l.split_k_data()
+'''
 
 if __name__ == '__main__':
     import os
@@ -226,5 +282,4 @@ if __name__ == '__main__':
     #     print( fpath )
     #     dtest3(fpath, fout)
     # fout.close()
-
 

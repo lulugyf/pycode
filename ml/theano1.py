@@ -15,8 +15,8 @@ def test4_1():
     f = ((a - b + c) * d )/e
     g = function([a, b, c, d, e], f)
 
-    print "Expected: ((1 - 2 + 3) * 4)/5.0 = ", ((1 - 2 + 3) * 4)/5.0
-    print "Via Theano: ((1 - 2 + 3) * 4)/5.0 = ", g(1, 2, 3, 4, 5)
+    print("Expected: ((1 - 2 + 3) * 4)/5.0 = ", ((1 - 2 + 3) * 4)/5.0)
+    print( "Via Theano: ((1 - 2 + 3) * 4)/5.0 = ", g(1, 2, 3, 4, 5))
 
 def test4_2():
     a = T.dmatrix('a')
@@ -31,8 +31,8 @@ def test4_2():
     b_data = numpy.array([[2, 2], [2, 2]])
     c_data = numpy.array([[5, 5], [5, 5]])
     d_data = numpy.array([[3, 3], [3, 3]])
-    print "Expected:", (a_data + b_data - c_data) * d_data
-    print "Via Theano:", f(a_data, b_data, c_data, d_data)
+    print( "Expected:", (a_data + b_data - c_data) * d_data )
+    print("Via Theano:", f(a_data, b_data, c_data, d_data) )
 
 def test4_3():
     a = T.dmatrix('a')
@@ -54,56 +54,56 @@ def test4_3():
     c_data = numpy.array([[5, 5], [5, 5]])
     d_data = numpy.array([[3, 3], [3, 3]])
 
-    print "Expected:", (((a_data * 1.0) + (b_data - 2.0) - (c_data + 3.0)) * d_data / 4.0) * 5.0
-    print "Via Theano:", f(a_data, b_data, c_data, d_data, 1, 2, 3, 4, 5)
+    print( "Expected:", (((a_data * 1.0) + (b_data - 2.0) - (c_data + 3.0)) * d_data / 4.0) * 5.0)
+    print("Via Theano:", f(a_data, b_data, c_data, d_data, 1, 2, 3, 4, 5) )
 
 def test4_4():
     # sigmoid
     a = T.dmatrix('a')
     f_a = T.nnet.sigmoid(a)
     f_sigmoid = function([a], [f_a])
-    print "sigmoid:", f_sigmoid([[-1, 0, 1]])
+    print("sigmoid:", f_sigmoid([[-1, 0, 1]]) )
 
     # tanh
     b = T.dmatrix('b')
     f_b = T.tanh(b)
     f_tanh = function([b], [f_b])
-    print "tanh:", f_tanh([[-1, 0, 1]])
+    print("tanh:", f_tanh([[-1, 0, 1]]) )
 
     # fast sigmoid
     c = T.dmatrix('c')
     f_c = T.nnet.ultra_fast_sigmoid(c)
     f_fast_sigmoid = function([c], [f_c])
-    print "fast sigmoid:", f_fast_sigmoid([[-1, 0, 1]])
+    print("fast sigmoid:", f_fast_sigmoid([[-1, 0, 1]]))
 
     # softplus
     d = T.dmatrix('d')
     f_d = T.nnet.softplus(d)
     f_softplus = function([d], [f_d])
-    print "soft plus:", f_softplus([[-1, 0, 1]])
+    print("soft plus:", f_softplus([[-1, 0, 1]]) )
 
     # relu
     e = T.dmatrix('e')
     f_e = T.nnet.relu(e)
     f_relu = function([e], [f_e])
-    print "relu:", f_relu([[-1, 0, 1]])
+    print("relu:", f_relu([[-1, 0, 1]]))
 
     # softmax
     f = T.dmatrix('f')
     f_f = T.nnet.softmax(f)
     f_softmax = function([f], [f_f])
-    print "soft max:", f_softmax([[-1, 0, 1]])
+    print("soft max:", f_softmax([[-1, 0, 1]]))
 
 def test4_5():
     x = T.dmatrix('x')
     y = shared(numpy.array([[4, 5, 6]]))
     z = x + y
     f = function(inputs=[x], outputs=[z])
-    print "Original Shared Value:", y.get_value()
-    print "Original Function Evaluation:", f([[1, 2, 3]])
+    print("Original Shared Value:", y.get_value())
+    print("Original Function Evaluation:", f([[1, 2, 3]]))
     y.set_value(numpy.array([[5, 6, 7]]))
-    print "Original Shared Value:", y.get_value()
-    print "Original Function Evaluation:", f([[1, 2, 3]])
+    print("Original Shared Value:", y.get_value())
+    print("Original Function Evaluation:", f([[1, 2, 3]]))
 
 def test4_6():
     x = T.dmatrix('x')
@@ -112,11 +112,11 @@ def test4_6():
     f = function(inputs=[x], outputs=[z])
     g = T.grad(z, [x])
     g_f = function([x], g)
-    print "Original:", f([[1, 2, 3]])
-    print "Original Gradient:", g_f([[1, 2, 3]])
+    print("Original:", f([[1, 2, 3]]))
+    print("Original Gradient:", g_f([[1, 2, 3]]))
     y.set_value(numpy.array([[1, 1, 1]]))
-    print "Updated:", f([[1, 2, 3]])
-    print "Updated Gradient", g_f([[1, 2, 3]])
+    print("Updated:", f([[1, 2, 3]]))
+    print("Updated Gradient", g_f([[1, 2, 3]]))
 
 def test4_7():
     # binary cross entropy
@@ -124,7 +124,7 @@ def test4_7():
     a2 = T.dmatrix('a2')
     f_a = T.nnet.binary_crossentropy(a1, a2).mean()
     f_sigmoid = function([a1, a2], [f_a])
-    print "Binary Cross Entropy [[0.01,0.01,0.01]],[[0.99,0.99,0.01]]:",
+    print("Binary Cross Entropy [[0.01,0.01,0.01]],[[0.99,0.99,0.01]]:", end=' ')
     f_sigmoid([[0.01, 0.01, 0.01]], [[0.99, 0.99, 0.01]])
 
     # categorical cross entropy
@@ -132,7 +132,7 @@ def test4_7():
     b2 = T.dmatrix('b2')
     f_b = T.nnet.categorical_crossentropy(b1, b2)
     f_sigmoid = function([b1, b2], [f_b])
-    print "Categorical Cross Entropy [[0.01,0.01,0.01]],[[0.99,0.99,0.01]]:",
+    print("Categorical Cross Entropy [[0.01,0.01,0.01]],[[0.99,0.99,0.01]]:", end=' ')
     f_sigmoid([[0.01, 0.01, 0.01]], [[0.99, 0.99, 0.01]])
 
     # squared error
@@ -143,7 +143,7 @@ def test4_7():
     c2 = T.dmatrix('b2')
     f_c = squared_error(c1, c2)
     f_squared_error = function([c1, c2], [f_c])
-    print "Squared Error [[0.01,0.01,0.01]],[[0.99,0.99,0.01]]:",
+    print("Squared Error [[0.01,0.01,0.01]],[[0.99,0.99,0.01]]:", end=' ')
     f_sigmoid([[0.01, 0.01, 0.01]], [[0.99, 0.99, 0.01]])
 
 def test4_8():
@@ -158,11 +158,11 @@ def test4_8():
     a = T.dmatrix('a')
     f_a = l1(a)
     f_l1 = function([a], f_a)
-    print "L1 Regularization:", f_l1([[0, 1, 3]])
+    print("L1 Regularization:", f_l1([[0, 1, 3]]))
     b = T.dmatrix('b')
     f_b = l2(b)
     f_l2 = function([b], f_b)
-    print "L2 Regularization:", f_l2([[0, 1, 3]])
+    print("L2 Regularization:", f_l2([[0, 1, 3]]))
 
 def test4_9():
     ## 4-9 Random Streams
@@ -173,9 +173,9 @@ def test4_9():
     b = T.dmatrix('a')
     f1 = a * b
     g1 = function([b], f1)
-    print "Invocation 1:", g1(numpy.ones((1,3)))
-    print "Invocation 2:", g1(numpy.ones((1,3)))
-    print "Invocation 3:", g1(numpy.ones((1,3)))
+    print("Invocation 1:", g1(numpy.ones((1,3))))
+    print("Invocation 2:", g1(numpy.ones((1,3))))
+    print("Invocation 3:", g1(numpy.ones((1,3))))
 
 def test4_10():
     import sklearn.metrics
@@ -196,9 +196,9 @@ def test4_10():
     gw, gb = T.grad(loss, [w, b])
     train = theano.function(inputs=[x,y],outputs=[p, error], updates=((w, w - 0.1 * gw), (b, b - 0.1 * gb)))
     predict = theano.function(inputs=[x], outputs=prediction)
-    print "Accuracy before Training:",sklearn.metrics.accuracy_score(D[1], predict(D[0]))
+    print("Accuracy before Training:",sklearn.metrics.accuracy_score(D[1], predict(D[0])))
     for i in range(training_steps):
         prediction, error = train(D[0], D[1])
-    print "Accuracy after Training:", sklearn.metrics.accuracy_score(D[1], predict(D[0]))
+    print("Accuracy after Training:", sklearn.metrics.accuracy_score(D[1], predict(D[0])))
 
 ############ current test

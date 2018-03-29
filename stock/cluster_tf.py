@@ -138,11 +138,11 @@ def cluster_1():
     points_expanded = tf.expand_dims(points, 0)
     centroids_expanded = tf.expand_dims(centroids, 1)
 
-    distances = tf.reduce_sum(tf.square(tf.sub(points_expanded, centroids_expanded)), 2)
+    distances = tf.reduce_sum(tf.square(tf.subtract(points_expanded, centroids_expanded)), 2)
     assignments = tf.argmin(distances, 0)
 
     means = []
-    for c in xrange(clusters_n):
+    for c in range(clusters_n):
         means.append(tf.reduce_mean(
             tf.gather(points,
                       tf.reshape(
@@ -158,7 +158,7 @@ def cluster_1():
 
     with tf.Session() as sess:
         sess.run(init)
-        for step in xrange(iteration_n):
+        for step in range(iteration_n):
             [_, centroid_values, points_values, assignment_values] = sess.run(
                 [update_centroids, centroids, points, assignments])
 
