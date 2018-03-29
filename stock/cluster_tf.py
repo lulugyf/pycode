@@ -177,22 +177,23 @@ def kmeans2():
     import time
 
     N = 10000
-    K = 4
+    K = 4  # num clusters
+    F = 2  # num features
     MAX_ITERS = 1000
 
     start = time.time()
 
-    points = tf.Variable(tf.random_uniform([N, 2]))
+    points = tf.Variable(tf.random_uniform([N, F]))
     cluster_assignments = tf.Variable(tf.zeros([N], dtype=tf.int64))
 
     # Silly initialization:  Use the first K points as the starting
     # centroids.  In the real world, do this better.
-    centroids = tf.Variable(tf.slice(points.initialized_value(), [0, 0], [K, 2]))
+    centroids = tf.Variable(tf.slice(points.initialized_value(), [0, 0], [K, F]))
 
     # Replicate to N copies of each centroid and K copies of each
     # point, then subtract and compute the sum of squared distances.
-    rep_centroids = tf.reshape(tf.tile(centroids, [N, 1]), [N, K, 2])
-    rep_points = tf.reshape(tf.tile(points, [1, K]), [N, K, 2])
+    rep_centroids = tf.reshape(tf.tile(centroids, [N, 1]), [N, K, F])
+    rep_points = tf.reshape(tf.tile(points, [1, K]), [N, K, F])
     sum_squares = tf.reduce_sum(tf.square(rep_points - rep_centroids),
                                 reduction_indices=2)
 
@@ -230,12 +231,18 @@ def kmeans2():
     [centers, assignments] = sess.run([centroids, cluster_assignments])
     end = time.time()
     print("Found in %.2f seconds" % (end - start)), iters, "iterations"
-    print
-    "Centroids:"
-    print
-    centers
-    print
-    "Cluster assignments:", assignments
+    print("Centroids:")
+    print(centers)
+    print("Cluster assignments:", assignments)
+    if F == 2:
+        import matplotlib.pyplot as plt
+        for i in range(K):
+            p = points[np.nonzero(assignments[:] == i), :]
+            plt.scatter(p[:, 0], p[:, 1])  # color='red'
+            c = centers[i, :]
+            plt.scatter(c[:, 0], c[:, 1], color='blue', s=20, edgecolor='none')
+        plt.show()
+    return centers, points, assignments
 
 if __name__ == '__main__':
     import sys, numpy as np
