@@ -187,18 +187,14 @@ def ts_down_increasely(basedir='e:/stock/list11', process_count=8):
 # 后续走势格式: fname date0 c0 maxC minC,   其中 maxC为后续 nextdays 中的最高收盘价涨幅(相对lsize最后一个数据的收盘价)
 # 文件数据格式 date open high low
 def split_one_file(args): # fpath, nH=11, loop=6, ratio=1.3):
-    fpath, fd, fd1, lsize , skip, nextdays, mindate  = args
-    dc = np.loadtxt(fpath, dtype=float)
-    if dc.shape[0] < 100: #太短的忽略
-        return 0
+    fpath, file_pos, fd, fd1, lsize , skip, nextdays  = args
+    with open(fpath) as fp:
+        fp.seek(file_pos)
+        dc = np.loadtxt(fp, dtype=float)
+
     #mindate = 20100101 # 取20100101 之后的数据
     fcode = fpath[-10:-4]
 
-    print("   ", dc[0, 0], dc[-1, 0], fpath)
-    for i in range(dc.shape[0]):
-        if dc[i, 0] > mindate:
-            dc = dc[i:, :]
-            break
     count = 0
     for i in range(0, dc.shape[0]-lsize-nextdays, skip):
         d = dc[i: i+lsize, 2] # close
@@ -215,16 +211,20 @@ def split_one_file(args): # fpath, nH=11, loop=6, ratio=1.3):
     print("===", fcode, count)
 
 def split_k_data(basedir = "e:/stock/list11",
-                 lines_file="e:/stock/lines0329.txt",
-                 tags_file="e:/stock/tag0329.txt",
-                 lsize=30, skip=5, nextdays=6, mindate=20100101):
+                 lines_file="e:/stock/2010_lines0330.txt",
+                 tags_file="e:/stock/2010_tag0330.txt",
+                 lsize=30, skip=5, nextdays=6, start_year="2010"):
 
     fd = open(lines_file, "w")
     fd1 = open(tags_file, "w")
-    arglist = [("%s/%s" % (basedir, fname), fd, fd1, lsize, skip, nextdays, mindate) for fname in os.listdir(basedir)]
+    year_index_file = "%s.idx.pickle"%basedir
+    if not os.path.exists(year_index_file):
+        gen_index_for_k_data(basedir)
+    with open(year_index_file, "rb") as fp:
+        year_index = pickle.load(fp)
+    arglist = [("%s/%s" % (basedir, fname), year_index.get("%s-%s"%(fname, start_year), 0), fd, fd1, lsize, skip, nextdays) for fname in os.listdir(basedir)]
     for args in arglist:
-        if True or args[0].find('603997') > 0:
-            split_one_file(args)
+        split_one_file(args)
     fd.close()
     fd1.close()
     print("done")
@@ -281,22 +281,14 @@ def draw_centers(centers, clusters):
 
 
 def daily_split_one_file(args): # fpath, nH=11, loop=6, ratio=1.3):
-    fpath, fd, fd1, lsize , skip, mindate  = args
-    dc = np.loadtxt(fpath, dtype=float)
-    if dc.shape[0] < 100: #太短的忽略
-        return 0
-    #mindate = 20100101 # 取20100101 之后的数据
-    fcode = fpath[-10:-4]
-
-    totalcount = dc.shape[0]
-    for i in range(totalcount):
-        if dc[i, 0] > mindate:
-            dc = dc[i:, :]
-            break
-    #print(i, totalcount, "=00000")
-    if i+1 >= totalcount:
-        print("==== skip", fcode, 0)
+    fpath, file_pos, fd, fd1, lsize , skip  = args
+    if file_pos < 0:
+        print("%s pos %d"%(fpath, file_pos))
         return
+    with open(fpath) as fp:
+        fp.seek(file_pos)
+        dc = np.loadtxt(fp, dtype=float)
+    fcode = fpath[-10:-4]
     count = 0
     for i in range(0, dc.shape[0]-lsize, skip):
         d = dc[i: i+lsize, 2] # close
@@ -311,18 +303,63 @@ def daily_split_one_file(args): # fpath, nH=11, loop=6, ratio=1.3):
     print("===", fcode, count)
 
 def daily_split_k_data(basedir = "e:/stock/list11",
-                 lines_file="e:/stock/lines0329.txt",
-                 tags_file="e:/stock/tags0329.txt",
-                 mindate=20180101,
+                 lines_file="e:/stock/day_lines0330.txt",
+                 tags_file="e:/stock/day_tags0330.txt",
+                 start_year="2018",
                  lsize=30, skip=2):
     fd = open(lines_file, "w")
     fd1 = open(tags_file, "w")
-    arglist = [("%s/%s" % (basedir, fname), fd, fd1, lsize, skip, mindate) for fname in os.listdir(basedir)]
+    year_index_file = "%s.idx.pickle"%basedir
+    if not os.path.exists(year_index_file):
+        gen_index_for_k_data(basedir)
+    with open(year_index_file, "rb") as fp:
+        year_index = pickle.load(fp)
+    arglist = [("%s/%s" % (basedir, fname), year_index.get("%s-%s"%(fname, start_year), -1), fd, fd1, lsize, skip) for fname in os.listdir(basedir)]
     for args in arglist:
         daily_split_one_file(args)  # if args[0].find("000035") > 0:
     fd.close()
     fd1.close()
     print("done")
+
+# 为k线数据生成年份索引
+def gen_index_for_k_data(basedir="e:/stock/list11"):
+    idx = {}
+    for fname in os.listdir(basedir):
+        fpath = "%s/%s"%(basedir, fname)
+        pos = -1
+        with open(fpath, "r") as fp:
+            year = "0"
+            while True:
+                line = fp.readline()
+                if line == '': break
+                y = line[:4]
+                if y != year:
+                    pos = fp.tell()-len(line)-2
+                    if pos < 0: pos = 0
+                    idx["%s-%s"%(fname, y)] = pos
+                    year = y
+    out_index = "%s.idx.pickle"%basedir
+    with open(out_index, "wb") as fp:
+        pickle.dump(idx, fp, pickle.HIGHEST_PROTOCOL)
+    print("generate year index of k_data done!")
+
+def daily_check_clusters(tags_file, cluster_result_path, clusters_want):
+    tag = np.loadtxt(tags_file, dtype='float32')
+
+    fn = [fname for fname in os.listdir(cluster_result_path) if fname.startswith('part-')]
+    fn = sorted(fn)  # spark输出的文件是多个， 需要排序后合并, 每一行是lines对应行的类别编号
+    cluster_file = "%s/clusters" % cluster_result_path
+    with open(cluster_file, "w") as fo:
+        for fname in fn:
+            with open("%s/%s" % (cluster_result_path, fname)) as fin:
+                for line in fin: fo.write(line)
+
+    clusters = np.loadtxt(cluster_file, dtype='int')  # 这个文件是spark 聚类计算结果
+    for cluster in clusters_want:
+        tt = tag[np.nonzero(clusters[:] == cluster)]
+        for i in range(tt.shape[0]):
+            t = tt[i, :]
+            print("cluster %d  code: %06d  date: %d"%(cluster, t[0], t[1]))
 
 if __name__ == '__main__':
     #downtushare_60()
