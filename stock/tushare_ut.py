@@ -238,15 +238,7 @@ def load_cluster_datasets(lines_file, tags_file, cluster_result_path):
     lines = np.loadtxt(lines_file)
     tag = np.loadtxt(tags_file, dtype='float32')
 
-    fn = [fname for fname in os.listdir(cluster_result_path) if fname.startswith('part-')]
-    fn = sorted(fn)  # spark输出的文件是多个， 需要排序后合并, 每一行是lines对应行的类别编号
-    cluster_file = "%s/clusters"%cluster_result_path
-    with open(cluster_file, "w") as fo:
-        for fname in fn:
-            with open("%s/%s"%(cluster_result_path, fname)) as fin:
-                for line in fin: fo.write(line)
-
-    clusters = np.loadtxt(cluster_file, dtype='int')  # 这个文件是spark 聚类计算结果
+    clusters = __merge_cluster_part_files(cluster_result_path)
     return lines, tag, clusters
 
 def check_clusters(tag, clusters, lines, num_clusters = 60, winpoint = 5.0, lostpoint = 0.0, ):
@@ -256,6 +248,9 @@ def check_clusters(tag, clusters, lines, num_clusters = 60, winpoint = 5.0, lost
     ll = []
     for i in range(num_clusters):
         c = tag[np.nonzero(clusters[:] == i)]
+        if c.shape[0] == 0:
+            print("cluster not found ", i)
+            continue
         w = c[np.nonzero(c[:, 2] > winpoint)].shape[0]
         l = c[np.nonzero(c[:, 2] < lostpoint)].shape[0]
         ll.append((i, c.shape[0], w*100.0/c.shape[0], l*100.0/c.shape[0]))
@@ -272,10 +267,13 @@ def check_clusters(tag, clusters, lines, num_clusters = 60, winpoint = 5.0, lost
     #plt.plot(cents[11, :]);  plt.show()
     return centers
 
-def draw_centers(centers, clusters):
+def draw_centers(centers, clusters_str):
     import matplotlib.pyplot as plt
-    for c in clusters:
-        plt.plot(centers[c], label="cluster %d"%c)
+    for line in clusters_str.strip().split("\n"):
+        n = line.strip().split()  # cluster 77  count: 1334 win: 66.04 lose 18.52
+        if len(n) < 8: continue
+        c = int(n[1])
+        plt.plot(centers[c], label=line)
     plt.legend()
     plt.show()
 
@@ -343,23 +341,146 @@ def gen_index_for_k_data(basedir="e:/stock/list11"):
         pickle.dump(idx, fp, pickle.HIGHEST_PROTOCOL)
     print("generate year index of k_data done!")
 
-def daily_check_clusters(tags_file, cluster_result_path, clusters_want):
-    tag = np.loadtxt(tags_file, dtype='float32')
-
+# 合并 spark 聚类输出文件
+def __merge_cluster_part_files(cluster_result_path):
+    cluster_file = "%s/clusters" % cluster_result_path
+    if os.path.exists(cluster_file):
+        clusters = np.loadtxt(cluster_file, dtype='int')  # 这个文件是spark 聚类计算结果
+        return clusters
     fn = [fname for fname in os.listdir(cluster_result_path) if fname.startswith('part-')]
     fn = sorted(fn)  # spark输出的文件是多个， 需要排序后合并, 每一行是lines对应行的类别编号
-    cluster_file = "%s/clusters" % cluster_result_path
+
     with open(cluster_file, "w") as fo:
         for fname in fn:
             with open("%s/%s" % (cluster_result_path, fname)) as fin:
                 for line in fin: fo.write(line)
-
     clusters = np.loadtxt(cluster_file, dtype='int')  # 这个文件是spark 聚类计算结果
+    return clusters
+
+# 输出对应类别的股票代码及选中日期
+def daily_check_clusters(tags_file, cluster_result_path, clusters_want):
+    tag = np.loadtxt(tags_file, dtype='float32')
+    clusters = __merge_cluster_part_files(cluster_result_path)
+
     for cluster in clusters_want:
         tt = tag[np.nonzero(clusters[:] == cluster)]
         for i in range(tt.shape[0]):
             t = tt[i, :]
             print("cluster %d  code: %06d  date: %d"%(cluster, t[0], t[1]))
+
+# 选中类别的中线绘制
+def daily_draw(lines_file, cluster_result_path, info_str):
+    import matplotlib.pyplot as plt
+    clusters = __merge_cluster_part_files(cluster_result_path)
+    lines = np.loadtxt(lines_file, dtype=float)
+    for l in info_str.strip().split("\n"): # cluster 96  count: 2501 win: 61.66 lose 13.39
+        n = l.strip().split()
+        if len(n) < 8: continue
+        cluster = int(n[1])
+        dc = lines[np.nonzero(clusters[:] == cluster)]
+        center = np.mean(dc, axis=0)
+        plt.plot(center, label=l)
+    plt.legend()
+    plt.show()
+
+def westerncandlestick(ax, quotes, width=0.2, colorup='k', colordown='r',
+                 ochl=True, linewidth=0.5):
+    import matplotlib.pyplot as plt
+    from matplotlib.lines import Line2D
+
+    """
+    Plot the time, open, high, low, close as a vertical line ranging
+    from low to high.  Use a rectangular bar to represent the
+    open-close span.  If close >= open, use colorup to color the bar,
+    otherwise use colordown
+    Parameters
+    ----------
+    ax : `Axes`
+        an Axes instance to plot to
+    quotes : sequence of quote sequences
+        data to plot.  time must be in float date format - see date2num
+        (time, open, high, low, close, ...) vs
+        (time, open, close, high, low, ...)
+        set by `ochl`
+    width : float
+        fraction of a day for the open and close lines
+    colorup : color
+        the color of the lines close >= open
+    colordown : color
+         the color of the lines where close <  open
+    ochl: bool
+        argument to select between ochl and ohlc ordering of quotes
+    linewidth: float
+        linewidth of lines
+    Returns
+    -------
+    ret : tuple
+        returns (lines, openlines, closelines) where lines is a list of lines
+        added
+    """
+
+    OFFSET = width / 2.0
+
+    lines = []
+    openlines = []
+    closelines = []
+    for q in quotes:
+        if ochl:
+            t, open, close, high, low = q[:5]
+        else:
+            t, open, high, low, close = q[:5]
+
+        if close >= open:
+            color = colorup
+        else:
+            color = colordown
+
+        vline = Line2D( xdata=(t, t), ydata=(low, high),
+            color=color, linewidth=linewidth, antialiased=True)
+        lines.append(vline)
+
+        openline = Line2D(xdata=(t - OFFSET, t), ydata=(open,open),
+                          color=color, linewidth=linewidth, antialiased=True)
+        openlines.append(openline)
+        closeline = Line2D(xdata=(t , t+OFFSET), ydata=(close,close),
+                          color=color, linewidth=linewidth, antialiased=True)
+        closelines.append(closeline)
+
+        ax.add_line(vline)
+        ax.add_line(openline)
+        ax.add_line(closeline)
+
+    ax.autoscale_view()
+    return lines, openlines, closelines
+
+def __to_quote_tuple(i, arr):
+    d = arr[0]; d1 = (int(d/10000), int(d%10000/100), int(d%100))
+    return (i, arr[1], arr[2], arr[3], arr[4])
+def candle_k(ax_pos=[0.05, 0.07, 0.9, 0.86]):
+    # https://stackoverflow.com/questions/44810875/how-to-draw-a-classic-stock-chart-with-matplotlib
+    import matplotlib.pyplot as plt
+
+    #fig = plt.figure()
+    ax = plt.axes(ax_pos)
+    k_file = "e:/stock/list11/300608.txt"
+    dc = np.loadtxt(k_file, dtype=float)[-50:, :]
+    quotes = [__to_quote_tuple(i, dc[i, :]) for i in range(dc.shape[0])]
+    westerncandlestick(ax, quotes, width=0.6, linewidth=1.44, ochl=True)
+
+    ax.get_figure().canvas.draw()
+    labels = [item.get_text() for item in ax.get_xticklabels()]
+    for i in range(1, len(labels)-1):
+        n = int(labels[i])
+        if n >= dc.shape[0]:
+            n = dc.shape[0]-1
+        labels[i] = "%d"%dc[n, 0]
+    ax.set_xticklabels(labels)
+
+    #ax.autoscale_view()
+    plt.grid(True)
+    plt.setp(plt.gca().get_xticklabels(), rotation=45, horizontalalignment='right')
+
+    plt.show()
 
 if __name__ == '__main__':
     #downtushare_60()
