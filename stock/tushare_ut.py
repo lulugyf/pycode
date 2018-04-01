@@ -235,19 +235,22 @@ def split_k_data(basedir = "e:/stock/list11",
     #     pickle.dump(lines, f, pickle.HIGHEST_PROTOCOL)
 
 def load_cluster_datasets(lines_file, tags_file, cluster_result_path):
-    lines = np.loadtxt(lines_file)
-    tag = np.loadtxt(tags_file, dtype='float32')
+    if lines_file is None:
+        lines = None
+    else:
+        lines = np.loadtxt(lines_file)
+    tags = np.loadtxt(tags_file, dtype='float32')
 
     clusters = __merge_cluster_part_files(cluster_result_path)
-    return lines, tag, clusters
+    return lines, tags, clusters
 
-def check_clusters(tag, clusters, lines, num_clusters = 60, winpoint = 5.0, lostpoint = 0.0, ):
-    # 计算各分类的胜率
+def check_clusters(tags, clusters, lines, num_clusters = 120, winpoint = 5.0, lostpoint = 0.0, ):
+    # 统计各分类的胜率
     #winpoint = 5.0 #最大收盘价涨幅点数
     #lostpoint = 0.0
     ll = []
     for i in range(num_clusters):
-        c = tag[np.nonzero(clusters[:] == i)]
+        c = tags[np.nonzero(clusters[:] == i)]
         if c.shape[0] == 0:
             print("cluster not found ", i)
             continue
@@ -259,6 +262,8 @@ def check_clusters(tag, clusters, lines, num_clusters = 60, winpoint = 5.0, lost
     for a, b, c, d in sll:
         print(" cluster %d  count: %d win: %.2f lose %.2f" % (a, b, c, d))
 
+    if lines is None:
+        return None
     # 计算各类的中点
     centers = np.zeros((num_clusters, lines.shape[1]))
     for i in range(num_clusters):
@@ -267,6 +272,7 @@ def check_clusters(tag, clusters, lines, num_clusters = 60, winpoint = 5.0, lost
     #plt.plot(cents[11, :]);  plt.show()
     return centers
 
+# 从 check_clusters 的屏幕输出中摘取部分统计结果, 画出对应的中线
 def draw_centers(centers, clusters_str):
     import matplotlib.pyplot as plt
     for line in clusters_str.strip().split("\n"):
@@ -277,6 +283,19 @@ def draw_centers(centers, clusters_str):
     plt.legend()
     plt.show()
 
+# 从指定类别中, 找出对应的code 和 日期, 便于画出k线
+def find_cluster(centers, cluster, clusters, tags):
+    tag = tags[np.nonzero(clusters[:]==cluster)]
+    center = centers[cluster]
+    tag = [ ("%06d"%tag[i, 0], int(tag[i, 1])) for i in range(tag.shape[0])]
+    return tag, center
+
+
+
+
+####################################
+#### 日常的处理过程
+####################################
 
 def daily_split_one_file(args): # fpath, nH=11, loop=6, ratio=1.3):
     fpath, file_pos, fd, fd1, lsize , skip  = args
@@ -383,104 +402,6 @@ def daily_draw(lines_file, cluster_result_path, info_str):
     plt.legend()
     plt.show()
 
-def westerncandlestick(ax, quotes, width=0.2, colorup='k', colordown='r',
-                 ochl=True, linewidth=0.5):
-    import matplotlib.pyplot as plt
-    from matplotlib.lines import Line2D
-
-    """
-    Plot the time, open, high, low, close as a vertical line ranging
-    from low to high.  Use a rectangular bar to represent the
-    open-close span.  If close >= open, use colorup to color the bar,
-    otherwise use colordown
-    Parameters
-    ----------
-    ax : `Axes`
-        an Axes instance to plot to
-    quotes : sequence of quote sequences
-        data to plot.  time must be in float date format - see date2num
-        (time, open, high, low, close, ...) vs
-        (time, open, close, high, low, ...)
-        set by `ochl`
-    width : float
-        fraction of a day for the open and close lines
-    colorup : color
-        the color of the lines close >= open
-    colordown : color
-         the color of the lines where close <  open
-    ochl: bool
-        argument to select between ochl and ohlc ordering of quotes
-    linewidth: float
-        linewidth of lines
-    Returns
-    -------
-    ret : tuple
-        returns (lines, openlines, closelines) where lines is a list of lines
-        added
-    """
-
-    OFFSET = width / 2.0
-
-    lines = []
-    openlines = []
-    closelines = []
-    for q in quotes:
-        if ochl:
-            t, open, close, high, low = q[:5]
-        else:
-            t, open, high, low, close = q[:5]
-
-        if close >= open:
-            color = colorup
-        else:
-            color = colordown
-
-        vline = Line2D( xdata=(t, t), ydata=(low, high),
-            color=color, linewidth=linewidth, antialiased=True)
-        lines.append(vline)
-
-        openline = Line2D(xdata=(t - OFFSET, t), ydata=(open,open),
-                          color=color, linewidth=linewidth, antialiased=True)
-        openlines.append(openline)
-        closeline = Line2D(xdata=(t , t+OFFSET), ydata=(close,close),
-                          color=color, linewidth=linewidth, antialiased=True)
-        closelines.append(closeline)
-
-        ax.add_line(vline)
-        ax.add_line(openline)
-        ax.add_line(closeline)
-
-    ax.autoscale_view()
-    return lines, openlines, closelines
-
-def __to_quote_tuple(i, arr):
-    d = arr[0]; d1 = (int(d/10000), int(d%10000/100), int(d%100))
-    return (i, arr[1], arr[2], arr[3], arr[4])
-def candle_k(ax_pos=[0.05, 0.07, 0.9, 0.86]):
-    # https://stackoverflow.com/questions/44810875/how-to-draw-a-classic-stock-chart-with-matplotlib
-    import matplotlib.pyplot as plt
-
-    #fig = plt.figure()
-    ax = plt.axes(ax_pos)
-    k_file = "e:/stock/list11/300608.txt"
-    dc = np.loadtxt(k_file, dtype=float)[-50:, :]
-    quotes = [__to_quote_tuple(i, dc[i, :]) for i in range(dc.shape[0])]
-    westerncandlestick(ax, quotes, width=0.6, linewidth=1.44, ochl=True)
-
-    ax.get_figure().canvas.draw()
-    labels = [item.get_text() for item in ax.get_xticklabels()]
-    for i in range(1, len(labels)-1):
-        n = int(labels[i])
-        if n >= dc.shape[0]:
-            n = dc.shape[0]-1
-        labels[i] = "%d"%dc[n, 0]
-    ax.set_xticklabels(labels)
-
-    #ax.autoscale_view()
-    plt.grid(True)
-    plt.setp(plt.gca().get_xticklabels(), rotation=45, horizontalalignment='right')
-
-    plt.show()
 
 if __name__ == '__main__':
     #downtushare_60()
