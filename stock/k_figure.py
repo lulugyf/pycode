@@ -129,8 +129,15 @@ def candle_k_date(ax, k_data_path, code, date, n_before, n_after, center):
         print("=== not found")
         return
 
-    C = dc[0, 2]
-    center_line = center * C / 100.0 + C
+    if n_before > center.shape[0]:
+        n = n_before - center.shape[0]
+        C = dc[n:, 2]
+        center_ = np.zeros(n_before)
+        center_[n:] = center
+        center_line = center_ * C / 100.0 + C
+    else:
+        C = dc[0, 2]
+        center_line = center * C / 100.0 + C
     ax.plot(center_line)
 
     quotes = [__to_quote_tuple(i, dc[i, :]) for i in range(dc.shape[0])]
@@ -160,6 +167,18 @@ def candle_k_date(ax, k_data_path, code, date, n_before, n_after, center):
     #
     # plt.show()
 
+_c = '''
+from tushare_ut import daily_find_cluster
+from k_figure import CandleK
+import os
+
+os.chdir('e:/stock')
+centers_file, cluster_result_path, tags_file = "centers0330.txt", "clustering_out_0402", "day_tags0402.txt"
+tags, center = daily_find_cluster(centers_file, cluster_result_path, tags_file, 50)
+k_data_path = 'e:/stock/list11'
+c = CandleK(k_data_path, tags, center)
+'''
+
 class CandleK:
     def __init__(self, k_data_path, tags, center, n_before=30, n_after=12):
         self.idx = 0
@@ -186,6 +205,8 @@ class CandleK:
             #        event.x, event.y, event.xdata, event.ydata))
             if event.button == 3 and self.idx >= 2:
                 self.idx -= 2
+        if self.idx >= len(self.tags):
+            self.idx = 0
         code, date = self.tags[self.idx]
         ax_pos = [0.05, 0.07, 0.9, 0.86]  # 调整图形在主图中的位置 [x, y, width, height]
         ax = plt.axes(ax_pos)

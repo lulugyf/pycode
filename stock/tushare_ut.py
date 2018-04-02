@@ -3,7 +3,6 @@
 
 import os
 import time
-import tushare as ts
 import io
 import datetime
 from multiprocessing import Pool
@@ -47,6 +46,7 @@ def format_files_60(basedir = 'e:/stock/60min'):
         print("file %s  count: %d"%(f, count))
 
 def __one_stock_hday(a):
+    import tushare as ts
     code, timeToMarket, basedir = a
     f_file = "%s/%s.txt"%(basedir, code)
     print("begin %s %s exists: %s"%(code, timeToMarket, os.path.exists(f_file)))
@@ -91,11 +91,13 @@ def downtushare_hday(basedir = "e:/stock/list11", f_slist = 'e:/stock/stocklist.
 
 # 下载 stock list 列表
 def downtushare_stocklist(f_slist="e:/stock/stocklist.txt"):
+    import tushare as ts
     df = ts.get_stock_basics()
     df.to_csv(f_slist, sep=',', header=None)  # mode='a', index=None
     print("down stock list done!")
 
 def __one_stock_60(a):
+    import tushare as ts
     code, timeToMarket, basedir, month_list = a
     f_file = "%s/%s.txt"%(basedir, code)
     print("begin %s %s exists: %s"%(code, timeToMarket, os.path.exists(f_file)))
@@ -145,6 +147,7 @@ def dateadd(sdate, n):
 
 import time
 def __ts_down_increasely(fpath):
+    import tushare as ts
     fname = fpath[fpath.rfind('/')+1:]
     if len(fname) != 10:
         print("not a properly file[%s]"%fname)
@@ -270,6 +273,8 @@ def check_clusters(tags, clusters, lines, num_clusters = 120, winpoint = 5.0, lo
         c = lines[np.nonzero(clusters[:] == i)]
         centers[i, :] = np.mean(c, axis=0)
     #plt.plot(cents[11, :]);  plt.show()
+    # centers_file = "e:/stock/centers0330.txt"
+    # np.savetxt(centers_file, centers, fmt="%.4f")
     return centers
 
 # 从 check_clusters 的屏幕输出中摘取部分统计结果, 画出对应的中线
@@ -377,15 +382,21 @@ def __merge_cluster_part_files(cluster_result_path):
     return clusters
 
 # 输出对应类别的股票代码及选中日期
+# daily_check_clusters('e:/stock/day_tags0402.txt', 'e:/stock/clustering_out_0402', (50, 51, 108, 77, 41))
 def daily_check_clusters(tags_file, cluster_result_path, clusters_want):
     tag = np.loadtxt(tags_file, dtype='float32')
     clusters = __merge_cluster_part_files(cluster_result_path)
 
+    out_list = []
     for cluster in clusters_want:
         tt = tag[np.nonzero(clusters[:] == cluster)]
         for i in range(tt.shape[0]):
-            t = tt[i, :]
-            print("cluster %d  code: %06d  date: %d"%(cluster, t[0], t[1]))
+            code, date = tt[i, :]
+            out_list.append((cluster, code, date ))
+
+    sorted_out = sorted(out_list, key=lambda kk: kk[2])
+    for cluster, code, date in sorted_out:
+        print("cluster %d  code: %06d  date: %d" % (cluster, code, date))
 
 # 选中类别的中线绘制
 def daily_draw(lines_file, cluster_result_path, info_str):
@@ -401,6 +412,17 @@ def daily_draw(lines_file, cluster_result_path, info_str):
         plt.plot(center, label=l)
     plt.legend()
     plt.show()
+
+# 从指定类别中, 找出对应的code 和 日期, 便于画出k线
+def daily_find_cluster(centers_file, cluster_result_path, tags_file, cluster):
+    tags = np.loadtxt(tags_file, dtype='float32')
+    clusters = __merge_cluster_part_files(cluster_result_path)
+    centers = np.loadtxt(centers_file, dtype="float32")
+
+    tag = tags[np.nonzero(clusters[:]==cluster)]
+    center = centers[cluster]
+    tag = [ ("%06d"%tag[i, 0], int(tag[i, 1])) for i in range(tag.shape[0])]
+    return tag, center
 
 
 if __name__ == '__main__':
